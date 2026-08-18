@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        {{ food["name"] }} - QuickBite
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+    <div class="logo">
+        🍔 QuickBite
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/menu">
+            Menu
+        </a>
+
+        <a href="/cart">
+            🛒 Cart
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="food-detail-container">
+
+
+    <a href="/menu"
+       class="back-link">
+
+        ← Back to menu
+
+    </a>
+
+
+    <div class="food-detail">
+
+
+        <div class="detail-image">
+
+            <img
+                src="{{ food['image'] }}"
+                alt="{{ food['name'] }}">
+
+        </div>
+
+
+        <div class="detail-info">
+
+
+            <span class="category">
+
+                {{ food["category"] }}
+
+            </span>
+
+
+            <h1>
+
+                {{ food["name"] }}
+
+            </h1>
+
+
+            <div class="rating">
+
+                ⭐⭐⭐⭐⭐
+
+                <span>
+                    4.8 (120+ reviews)
+                </span>
+
+            </div>
+
+
+            <p class="detail-description">
+
+                {{ food["description"] }}
+
+            </p>
+
+
+            <div class="detail-price">
+
+                ₹{{ food["price"] }}
+
+            </div>
+
+
+            <div class="detail-info-box">
+
+                <div>
+                    🚚
+                    <strong>Fast Delivery</strong>
+                </div>
+
+                <div>
+                    🥗
+                    <strong>Freshly Made</strong>
+                </div>
+
+                <div>
+                    ❤️
+                    <strong>Customer Favourite</strong>
+                </div>
+
+            </div>
+
+
+            <a
+                href="/add/{{ food['id'] }}"
+                class="btn add-big">
+
+                🛒 Add to Cart
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

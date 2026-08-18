@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>QuickBite - Menu</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav>
+
+    <div class="logo">
+        🍔 QuickBite
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/menu"
+           class="active">
+            Menu
+        </a>
+
+        <a href="/cart">
+            🛒 Cart
+        </a>
+
+    </div>
+
+</nav>
+
+
+<section class="menu-header">
+
+    <div>
+
+        <span class="mini-title">
+            EXPLORE OUR MENU
+        </span>
+
+        <h1>
+            What are you craving today? 😋
+        </h1>
+
+        <p>
+            Pick your favourite and let's get cooking.
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="container">
+
+
+    <!-- SEARCH -->
+
+    <form action="/menu"
+          method="GET"
+          class="big-search">
+
+        <span>
+            🔍
+        </span>
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search for pizza, burger, biryani..."
+            value="{{ search }}">
+
+        <button>
+            Search
+        </button>
+
+    </form>
+
+
+    <!-- CATEGORIES -->
+
+    <div class="categories">
+
+        <a href="/menu"
+           class="category-btn
+           {% if not category %}selected{% endif %}">
+
+            🍽️ All
+
+        </a>
+
+
+        {% for cat in categories %}
+
+        <a
+            href="/menu?category={{ cat['category'] }}"
+            class="category-btn
+            {% if category == cat['category'] %}selected{% endif %}">
+
+            {{ cat["category"] }}
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="menu-count">
+
+        {{ foods|length }} delicious choices found 🍴
+
+    </div>
+
+
+    <div class="food-grid menu-grid">
+
+
+        {% for food in foods %}
+
+
+        <a
+            href="/food/{{ food['id'] }}"
+            class="food-card-link">
+
+
+            <div class="food-card">
+
+
+                <div class="food-photo">
+
+                    <img
+                        src="{{ food['image'] }}"
+                        alt="{{ food['name'] }}">
+
+                    <span class="food-emoji">
+                        {{ food['emoji'] }}
+                    </span>
+
+                </div>
+
+
+                <div class="food-info">
+
+                    <span class="category">
+                        {{ food['category'] }}
+                    </span>
+
+
+                    <h3>
+                        {{ food['name'] }}
+                    </h3>
+
+
+                    <p>
+                        {{ food['description'] }}
+                    </p>
+
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            ₹{{ food['price'] }}
+                        </strong>
+
+
+                        <span class="view-food">
+                            View food →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </a>
+
+
+        {% else %}
+
+
+        <div class="empty">
+
+            <h2>
+                😭 god found
+            </h2>
+
+            <p>
+                Try searching for something else.
+            </p>
+
+            <br>
+
+            <a href="/menu"
+               class="btn">
+
+                Show all food
+
+            </a>
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+</section>
+
+
+</body>
+
+</html>

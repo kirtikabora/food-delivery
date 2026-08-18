@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>QuickBite 🍔</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav>
+
+    <div class="logo">
+        🍔 QuickBite
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/" class="active">
+            Home
+        </a>
+
+        <a href="/menu">
+            Menu
+        </a>
+
+        <a href="/cart">
+            🛒 Cart
+        </a>
+
+    </div>
+
+</nav>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="hero-tag">
+            ✨ Fresh • Fast • Delicious
+        </span>
+
+        <h1>
+            Your cravings,
+            <span>delivered.</span>
+        </h1>
+
+        <p>
+            Discover delicious food from our menu
+            and get it delivered straight to your door.
+        </p>
+
+        <a href="/menu"
+           class="btn hero-btn">
+
+            Explore Menu 🍕 →
+
+        </a>
+
+    </div>
+
+
+    <div class="hero-image">
+
+        <img
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=85"
+            alt="Delicious food">
+
+    </div>
+
+</section>
+
+
+<section class="container">
+
+    <div class="section-heading">
+
+        <div>
+
+            <span class="mini-title">
+                OUR FAVOURITES
+            </span>
+
+            <h2>
+                Popular right now 🔥
+            </h2>
+
+        </div>
+
+        <a href="/menu">
+            View all →
+        </a>
+
+    </div>
+
+
+    <div class="food-grid">
+
+        {% for food in foods %}
+
+        <a href="/food/{{ food['id'] }}"
+           class="food-card-link">
+
+            <div class="food-card">
+
+                <div class="food-photo">
+
+                    <img
+                        src="{{ food['image'] }}"
+                        alt="{{ food['name'] }}">
+
+                    <span class="food-emoji">
+                        {{ food['emoji'] }}
+                    </span>
+
+                </div>
+
+                <div class="food-info">
+
+                    <span class="category">
+                        {{ food['category'] }}
+                    </span>
+
+                    <h3>
+                        {{ food['name'] }}
+                    </h3>
+
+                    <p>
+                        {{ food['description'] }}
+                    </p>
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            ₹{{ food['price'] }}
+                        </strong>
+
+                        <span class="view-food">
+                            View →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <strong>
+        🍔 QuickBite
+    </strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+
+</html>

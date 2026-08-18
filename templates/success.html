@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        QuickBite - Order Tracking
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+    <div class="logo">
+        🍔 QuickBite
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/menu">
+            Menu
+        </a>
+
+    </div>
+
+</nav>
+
+
+<section class="success">
+
+
+    <div class="success-icon">
+        🎉
+    </div>
+
+
+    <h1>
+        Order Confirmed!
+    </h1>
+
+
+    <p>
+
+        Thank you,
+        <strong>
+            {{ customer.get("name", "Customer") }}
+        </strong>!
+
+    </p>
+
+
+    <p>
+        Your delicious food is being prepared. 🍔
+    </p>
+
+
+    <div class="tracking">
+
+
+        <div class="track-step active">
+
+            <div>
+                ✓
+            </div>
+
+            <p>
+                Order Placed
+            </p>
+
+        </div>
+
+
+        <div class="track-line"></div>
+
+
+        <div class="track-step active">
+
+            <div>
+                👨‍🍳
+            </div>
+
+            <p>
+                Preparing
+            </p>
+
+        </div>
+
+
+        <div class="track-line"></div>
+
+
+        <div class="track-step active">
+
+            <div>
+                🛵
+            </div>
+
+            <p>
+                Rider Picked Up
+            </p>
+
+        </div>
+
+
+        <div class="track-line"></div>
+
+
+        <div class="track-step">
+
+            <div>
+                🏠
+            </div>
+
+            <p>
+                Delivered
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="delivery-card">
+
+        <h3>
+            🛵 Your Delivery Partner
+        </h3>
+
+        <p>
+            Your rider is on the way!
+        </p>
+
+        <strong>
+            Estimated delivery: 25–35 minutes
+        </strong>
+
+    </div>
+
+
+    <a href="/menu"
+       class="btn">
+
+        Order More 🍔
+
+    </a>
+
+
+</section>
+
+
+</body>
+
+</html>

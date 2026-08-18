@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QuickBite - Payment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">🍔 QuickBite</div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/cart">🛒 Cart</a>
+    </div>
+</nav>
+
+<div class="form-container">
+
+    <h1>Payment 💳</h1>
+
+    <div class="payment-total">
+
+        <p>Total Amount</p>
+
+        <h2>₹{{ "%.2f"|format(total) }}</h2>
+
+    </div>
+
+    <form method="POST">
+
+        <h3>Select Payment Method</h3>
+
+        <div class="payment-options">
+
+            <label>
+                <input type="radio" name="payment" value="card" checked>
+                💳 Card
+            </label>
+
+            <label>
+                <input type="radio" name="payment" value="upi">
+                📱 UPI
+            </label>
+
+            <label>
+                <input type="radio" name="payment" value="cash">
+                💵 Cash on Delivery
+            </label>
+
+        </div>
+
+        <button type="submit" class="btn full-btn">
+            Pay ₹{{ "%.2f"|format(total) }}
+        </button>
+
+    </form>
+
+    <p class="fake-payment">
+        🔒 Demo payment only — no real money is charged.
+    </p>
+
+</div>
+
+</body>
+</html>

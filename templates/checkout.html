@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QuickBite - Checkout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">🍔 QuickBite</div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/menu">Menu</a>
+        <a href="/cart">🛒 Cart</a>
+    </div>
+</nav>
+
+<div class="form-container">
+
+    <h1>Delivery Details 📦</h1>
+
+    <form method="POST">
+
+        <label>Name</label>
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Your name"
+            required
+        >
+
+        <label>Phone</label>
+
+        <input
+            type="tel"
+            name="phone"
+            placeholder="Phone number"
+            required
+        >
+
+        <label>Delivery Address</label>
+
+        <textarea
+            name="address"
+            placeholder="Enter your delivery address"
+            required
+        ></textarea>
+
+        <button type="submit" class="btn full-btn">
+            Continue to Payment →
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

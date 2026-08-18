@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        QuickBite - Cart
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+    <div class="logo">
+        🍔 QuickBite
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/menu">
+            Menu
+        </a>
+
+        <a href="/cart"
+           class="active">
+            🛒 Cart
+        </a>
+
+    </div>
+
+</nav>
+
+
+<section class="container">
+
+
+    <h1>
+        Your Cart 🛒
+    </h1>
+
+
+    {% if items %}
+
+
+    <div class="cart-container">
+
+
+        {% for item in items %}
+
+
+        <div class="cart-item">
+
+
+            <div class="cart-food">
+
+
+                <img
+                    src="{{ item.food['image'] }}"
+                    class="cart-image">
+
+
+                <div>
+
+                    <h3>
+                        {{ item.food["name"] }}
+                    </h3>
+
+                    <p>
+                        ₹{{ item.food["price"] }} each
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="quantity">
+
+                <a href="/remove/{{ item.food['id'] }}">
+                    −
+                </a>
+
+                <strong>
+                    {{ item.quantity }}
+                </strong>
+
+                <a href="/add/{{ item.food['id'] }}">
+                    +
+                </a>
+
+            </div>
+
+
+            <strong>
+                ₹{{ "%.2f"|format(item.subtotal) }}
+            </strong>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+        <div class="coupon">
+
+
+            <h3>
+                🎟️ Have a coupon?
+            </h3>
+
+
+            <form
+                action="/apply_coupon"
+                method="POST">
+
+
+                <input
+                    type="text"
+                    name="coupon"
+                    placeholder="WELCOME20 or FOOD50">
+
+
+                <button>
+                    Apply
+                </button>
+
+
+            </form>
+
+
+            {% if coupon %}
+
+            <p class="coupon-success">
+
+                🎉 {{ coupon }} applied!
+
+            </p>
+
+            {% endif %}
+
+
+        </div>
+
+
+        <div class="bill">
+
+
+            <p>
+
+                Subtotal:
+
+                <strong>
+                    ₹{{ "%.2f"|format(total) }}
+                </strong>
+
+            </p>
+
+
+            {% if discount > 0 %}
+
+            <p class="discount">
+
+                Discount:
+
+                -₹{{ "%.2f"|format(discount) }}
+
+            </p>
+
+            {% endif %}
+
+
+            <h2>
+
+                Total:
+
+                ₹{{ "%.2f"|format(final_total) }}
+
+            </h2>
+
+
+            <a href="/checkout"
+               class="btn">
+
+                Checkout →
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty">
+
+        <h2>
+            🛒 Your cart is empty
+        </h2>
+
+        <p>
+            Your stomach called. It wants food. 😂
+        </p>
+
+        <br>
+
+        <a href="/menu"
+           class="btn">
+
+            Browse Menu
+
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</section>
+
+
+</body>
+
+</html>
