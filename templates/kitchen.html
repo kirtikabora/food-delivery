@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Smart Kitchen</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='kitchen.css') }}">
+
+</head>
+
+<body>
+
+<header>
+
+    <div>
+        <h1>👨‍🍳 Smart Kitchen</h1>
+        <p>QuickBite Restaurant Control Center</p>
+    </div>
+
+    <a href="/">🏠 QuickBite</a>
+
+</header>
+
+
+<!-- ================= STATS ================= -->
+
+<section class="stats">
+
+    <div class="card">
+        <h3>📦 Orders</h3>
+        <h2>{{ total_orders }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>🔥 Preparing</h3>
+        <h2>{{ preparing }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>🍱 Ready</h3>
+        <h2>{{ ready }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>💰 Revenue</h3>
+        <h2>₹{{ revenue }}</h2>
+    </div>
+
+</section>
+
+
+<!-- ================= ORDERS ================= -->
+
+<h2>📦 Smart Order Queue</h2>
+
+<section class="orders">
+
+{% for order in orders %}
+
+<div class="order
+
+{% if order['priority'] == 3 %}
+urgent
+{% elif order['priority'] == 2 %}
+medium
+{% endif %}">
+
+    <div class="order-top">
+
+        <h2>
+            Order #{{ order["id"] }}
+        </h2>
+
+        {% if order["priority"] == 3 %}
+
+        <span class="badge urgent-badge">
+            🔥 HIGH PRIORITY
+        </span>
+
+        {% elif order["priority"] == 2 %}
+
+        <span class="badge">
+            ⚡ PRIORITY
+        </span>
+
+        {% else %}
+
+        <span class="badge normal">
+            NORMAL
+        </span>
+
+        {% endif %}
+
+    </div>
+
+
+    <p>👤 {{ order["customer_name"] }}</p>
+
+    <p>📞 {{ order["phone"] }}</p>
+
+    <p>📍 {{ order["address"] }}</p>
+
+    <p>💰 ₹{{ order["total"] }}</p>
+
+    <p>
+        ⏱️ Estimated preparation:
+        <strong>
+            {{ order["prep_time"] }} minutes
+        </strong>
+    </p>
+
+    <p>
+        📅 {{ order["created_at"] }}
+    </p>
+
+
+    <div class="status">
+
+        Status:
+
+        <strong>
+            {{ order["status"] }}
+        </strong>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <a href="/kitchen/update/{{ order['id'] }}/New">
+            🆕
+        </a>
+
+        <a href="/kitchen/update/{{ order['id'] }}/Preparing">
+            👨‍🍳
+        </a>
+
+        <a href="/kitchen/update/{{ order['id'] }}/Ready">
+            🍱
+        </a>
+
+        <a href="/kitchen/update/{{ order['id'] }}/Completed">
+            ✅
+        </a>
+
+    </div>
+
+
+    <!-- RIDER -->
+
+    <h3>🛵 Rider</h3>
+
+    {% if order["rider_name"] %}
+
+        <p>
+            Assigned to:
+            <strong>
+                {{ order["rider_name"] }}
+            </strong>
+        </p>
+
+    {% else %}
+
+        <form
+            action="/kitchen/assign/{{ order['id'] }}"
+            method="POST">
+
+            <select name="rider_id">
+
+                {% for rider in riders %}
+
+                    {% if rider["status"] == "Available" %}
+
+                    <option value="{{ rider['id'] }}">
+                        {{ rider["name"] }}
+                    </option>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </select>
+
+            <button>
+                Assign Rider
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</div>
+
+{% else %}
+
+<div class="empty">
+
+    <h2>🍽️ No orders yet</h2>
+
+    <p>
+        Orders will appear here after checkout.
+    </p>
+
+</div>
+
+{% endfor %}
+
+</section>
+
+
+<!-- ================= INVENTORY ================= -->
+
+<h2>📦 Smart Inventory</h2>
+
+<section class="inventory">
+
+{% for item in inventory %}
+
+<div class="inventory-card">
+
+    <h3>
+        {{ item["item"] }}
+    </h3>
+
+    <p>
+        Stock:
+        <strong>
+            {{ item["quantity"] }}
+        </strong>
+    </p>
+
+
+    {% if item["quantity"] <= item["minimum"] %}
+
+        <div class="warning">
+            🚨 LOW STOCK
+        </div>
+
+    {% else %}
+
+        <div class="good">
+            ✅ Stock OK
+        </div>
+
+    {% endif %}
+
+
+    <form
+        action="/kitchen/inventory/{{ item['id'] }}"
+        method="POST">
+
+        <input
+            type="number"
+            name="quantity"
+            value="{{ item['quantity'] }}"
+            min="0">
+
+        <button>
+            Update
+        </button>
+
+    </form>
+
+</div>
+
+{% endfor %}
+
+</section>
+
+
+<!-- ================= RIDERS ================= -->
+
+<h2>🛵 Rider Management</h2>
+
+<section class="riders">
+
+{% for rider in riders %}
+
+<div class="rider">
+
+    <h3>
+        🛵 {{ rider["name"] }}
+    </h3>
+
+    <p>
+        📞 {{ rider["phone"] }}
+    </p>
+
+    <p>
+        Status:
+        <strong>
+            {{ rider["status"] }}
+        </strong>
+    </p>
+
+
+    {% if rider["status"] == "Busy" %}
+
+    <a href="/kitchen/rider/{{ rider['id'] }}/available">
+        Mark Available
+    </a>
+
+    {% endif %}
+
+</div>
+
+{% endfor %}
+
+</section>
+
+</body>
+
+</html>

@@ -31,7 +31,7 @@ def init_db():
         )
     """)
 
-    # ORDER TABLE
+    # ORDERS TABLE
     conn.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,64 +40,11 @@ def init_db():
             address TEXT,
             total REAL,
             status TEXT DEFAULT 'New',
-            created_at TEXT,
-            priority INTEGER DEFAULT 1,
-            prep_time INTEGER DEFAULT 15,
-            rider_id INTEGER
+            created_at TEXT
         )
     """)
 
-    # =================================================
-    # FIX OLD DATABASE
-    # Adds new columns if they don't already exist
-    # =================================================
-
-    try:
-        conn.execute("""
-            ALTER TABLE orders
-            ADD COLUMN priority INTEGER DEFAULT 1
-        """)
-    except sqlite3.OperationalError:
-        pass
-
-    try:
-        conn.execute("""
-            ALTER TABLE orders
-            ADD COLUMN prep_time INTEGER DEFAULT 15
-        """)
-    except sqlite3.OperationalError:
-        pass
-
-    try:
-        conn.execute("""
-            ALTER TABLE orders
-            ADD COLUMN rider_id INTEGER
-        """)
-    except sqlite3.OperationalError:
-        pass
-
-    # RIDER TABLE
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS riders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            phone TEXT,
-            status TEXT DEFAULT 'Available'
-        )
-    """)
-
-    # INVENTORY TABLE
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS inventory (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item TEXT NOT NULL,
-            quantity INTEGER DEFAULT 0,
-            minimum INTEGER DEFAULT 5
-        )
-    """)
-
-    # ================= FOOD DATA =================
-
+    # ADD FOOD
     count = conn.execute(
         "SELECT COUNT(*) FROM foods"
     ).fetchone()[0]
@@ -122,54 +69,6 @@ def init_db():
             (name, price, category, emoji)
             VALUES (?, ?, ?, ?)
         """, foods)
-
-    # ================= RIDERS =================
-
-    rider_count = conn.execute(
-        "SELECT COUNT(*) FROM riders"
-    ).fetchone()[0]
-
-    if rider_count == 0:
-
-        riders = [
-            ("Rahul", "9876543210", "Available"),
-            ("Arjun", "9876543211", "Available"),
-            ("Aman", "9876543212", "Available"),
-            ("Vikash", "9876543213", "Available")
-        ]
-
-        conn.executemany("""
-            INSERT INTO riders
-            (name, phone, status)
-            VALUES (?, ?, ?)
-        """, riders)
-
-    # ================= INVENTORY =================
-
-    inventory_count = conn.execute(
-        "SELECT COUNT(*) FROM inventory"
-    ).fetchone()[0]
-
-    if inventory_count == 0:
-
-        inventory = [
-            ("Burger Buns", 20, 5),
-            ("Cheese", 15, 5),
-            ("Chicken", 20, 5),
-            ("Pizza Base", 10, 3),
-            ("Potatoes", 25, 5),
-            ("Momos", 15, 5),
-            ("Pasta", 20, 5),
-            ("Paneer", 15, 5),
-            ("Cake", 10, 3),
-            ("Coffee", 20, 5)
-        ]
-
-        conn.executemany("""
-            INSERT INTO inventory
-            (item, quantity, minimum)
-            VALUES (?, ?, ?)
-        """, inventory)
 
     conn.commit()
     conn.close()
@@ -330,10 +229,7 @@ def cart():
     discount = session.get("discount", 0)
     coupon = session.get("coupon", "")
 
-    final_total = max(
-        0,
-        total - discount
-    )
+    final_total = max(0, total - discount)
 
     return render_template(
         "cart.html",
@@ -350,15 +246,14 @@ def cart():
 @app.route("/apply_coupon", methods=["POST"])
 def apply_coupon():
 
-    coupon = request.form.get(
-        "coupon", ""
-    ).strip().upper()
+    coupon = request.form.get("coupon", "").strip().upper()
 
     cart = session.get("cart", {})
 
     if not cart:
         return redirect(url_for("cart"))
 
+    # Calculate subtotal
     total = 0
 
     conn = get_db()
@@ -375,14 +270,19 @@ def apply_coupon():
 
     conn.close()
 
+    # Coupon rules
     if coupon == "WELCOME20":
 
-        session["discount"] = total * 0.20
+        discount = total * 0.20
+
+        session["discount"] = discount
         session["coupon"] = "WELCOME20"
 
     elif coupon == "FOOD50":
 
-        session["discount"] = min(50, total)
+        discount = min(50, total)
+
+        session["discount"] = discount
         session["coupon"] = "FOOD50"
 
     else:
@@ -440,78 +340,40 @@ def payment():
         if food:
             total += food["price"] * quantity
 
+    # Apply coupon discount
     discount = session.get("discount", 0)
 
-    final_total = max(
-        0,
-        total - discount
-    )
+    final_total = max(0, total - discount)
 
     if request.method == "POST":
 
-        customer = session.get(
-            "customer", {}
-        )
+        customer = session.get("customer", {})
 
-        # ================= SMART PRIORITY =================
-
-        item_count = sum(
-            cart.values()
-        )
-
-        if item_count >= 5:
-            priority = 3
-
-        elif item_count >= 3:
-            priority = 2
-
-        else:
-            priority = 1
-
-        # ================= PREPARATION TIME =================
-
-        prep_time = 10 + (
-            item_count * 5
-        )
-
-        # ================= CREATE ORDER =================
-
+        # SAVE ORDER FOR KITCHEN
         conn.execute("""
             INSERT INTO orders
-            (
-                customer_name,
-                phone,
-                address,
-                total,
-                status,
-                created_at,
-                priority,
-                prep_time
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (customer_name, phone, address, total, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (
             customer.get("name"),
             customer.get("phone"),
             customer.get("address"),
             final_total,
             "New",
-            datetime.now().strftime(
-                "%Y-%m-%d %H:%M"
-            ),
-            priority,
-            prep_time
+            datetime.now().strftime("%Y-%m-%d %H:%M")
         ))
 
         conn.commit()
         conn.close()
 
+        # Clear cart
         session["cart"] = {}
+
+        # Clear coupon
         session["discount"] = 0
         session["coupon"] = ""
 
-        return redirect(
-            url_for("success")
-        )
+        return redirect(url_for("success"))
 
     conn.close()
 
@@ -526,9 +388,7 @@ def payment():
 @app.route("/success")
 def success():
 
-    customer = session.get(
-        "customer", {}
-    )
+    customer = session.get("customer", {})
 
     return render_template(
         "success.html",
@@ -537,8 +397,11 @@ def success():
 
 
 # =====================================================
-#                  SMART KITCHEN
+#                 SMART KITCHEN SYSTEM
 # =====================================================
+
+
+# ================= KITCHEN DASHBOARD =================
 
 @app.route("/kitchen")
 def kitchen():
@@ -546,15 +409,8 @@ def kitchen():
     conn = get_db()
 
     orders = conn.execute("""
-        SELECT
-            orders.*,
-            riders.name AS rider_name
-        FROM orders
-        LEFT JOIN riders
-        ON orders.rider_id = riders.id
-        ORDER BY
-            priority DESC,
-            id DESC
+        SELECT * FROM orders
+        ORDER BY id DESC
     """).fetchall()
 
     total_orders = conn.execute(
@@ -567,30 +423,22 @@ def kitchen():
         WHERE status = 'Preparing'
     """).fetchone()[0]
 
-    ready = conn.execute("""
-        SELECT COUNT(*)
-        FROM orders
-        WHERE status = 'Ready'
-    """).fetchone()[0]
-
     completed = conn.execute("""
         SELECT COUNT(*)
         FROM orders
         WHERE status = 'Completed'
     """).fetchone()[0]
 
+    ready = conn.execute("""
+        SELECT COUNT(*)
+        FROM orders
+        WHERE status = 'Ready'
+    """).fetchone()[0]
+
     revenue = conn.execute("""
         SELECT COALESCE(SUM(total), 0)
         FROM orders
     """).fetchone()[0]
-
-    riders = conn.execute(
-        "SELECT * FROM riders"
-    ).fetchall()
-
-    inventory = conn.execute(
-        "SELECT * FROM inventory"
-    ).fetchall()
 
     conn.close()
 
@@ -599,23 +447,16 @@ def kitchen():
         orders=orders,
         total_orders=total_orders,
         preparing=preparing,
-        ready=ready,
         completed=completed,
-        revenue=revenue,
-        riders=riders,
-        inventory=inventory
+        ready=ready,
+        revenue=revenue
     )
 
 
 # ================= UPDATE ORDER =================
 
-@app.route(
-    "/kitchen/update/<int:order_id>/<status>"
-)
-def update_order_status(
-    order_id,
-    status
-):
+@app.route("/kitchen/update/<int:order_id>/<status>")
+def update_order_status(order_id, status):
 
     allowed_statuses = [
         "New",
@@ -641,116 +482,10 @@ def update_order_status(
     conn.commit()
     conn.close()
 
-    return redirect(
-        url_for("kitchen")
-    )
+    return redirect(url_for("kitchen"))
 
 
-# ================= ASSIGN RIDER =================
-
-@app.route(
-    "/kitchen/assign/<int:order_id>",
-    methods=["POST"]
-)
-def assign_rider(order_id):
-
-    rider_id = request.form.get(
-        "rider_id"
-    )
-
-    if not rider_id:
-        return redirect(url_for("kitchen"))
-
-    conn = get_db()
-
-    conn.execute("""
-        UPDATE orders
-        SET rider_id = ?
-        WHERE id = ?
-    """, (
-        rider_id,
-        order_id
-    ))
-
-    conn.execute("""
-        UPDATE riders
-        SET status = 'Busy'
-        WHERE id = ?
-    """, (
-        rider_id,
-    ))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(
-        url_for("kitchen")
-    )
-
-
-# ================= RIDER AVAILABLE =================
-
-@app.route(
-    "/kitchen/rider/<int:rider_id>/available"
-)
-def rider_available(rider_id):
-
-    conn = get_db()
-
-    conn.execute("""
-        UPDATE riders
-        SET status = 'Available'
-        WHERE id = ?
-    """, (
-        rider_id,
-    ))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(
-        url_for("kitchen")
-    )
-
-
-# ================= INVENTORY =================
-
-@app.route(
-    "/kitchen/inventory/<int:item_id>",
-    methods=["POST"]
-)
-def update_inventory(item_id):
-
-    quantity = request.form.get(
-        "quantity",
-        0
-    )
-
-    try:
-        quantity = int(quantity)
-    except ValueError:
-        quantity = 0
-
-    conn = get_db()
-
-    conn.execute("""
-        UPDATE inventory
-        SET quantity = ?
-        WHERE id = ?
-    """, (
-        quantity,
-        item_id
-    ))
-
-    conn.commit()
-    conn.close()
-
-    return redirect(
-        url_for("kitchen")
-    )
-
-
-# ================= RUN APP =================
+# ================= RUN =================
 
 if __name__ == "__main__":
 
