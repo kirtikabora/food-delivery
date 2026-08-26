@@ -10,6 +10,10 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
 
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='reviews.css') }}">      
+        
+
 </head>
 
 
@@ -81,15 +85,11 @@
             </h1>
 
 
-            <div class="rating">
+    <div class="rating" id="food-rating">
 
-                ⭐⭐⭐⭐⭐
+         ⭐ No ratings yet
 
-                <span>
-                    4.8 (120+ reviews)
-                </span>
-
-            </div>
+</div>
 
 
             <p class="detail-description">
@@ -142,6 +142,189 @@
 
 
 </div>
+
+   <!-- Reviews & Ratings Section -->
+<div class="reviews-section">
+
+    <h2>⭐ Reviews & Ratings</h2>
+
+    <!-- Average Rating -->
+    <div id="average-rating" class="average-rating">
+        ⭐ No ratings yet
+    </div>
+
+    <!-- Review Form -->
+    <div class="review-form">
+
+        <h3>Write a Review</h3>
+
+        <form
+            method="POST"
+            action="{{ url_for('reviews.submit_review', food_id=food['id']) }}">
+
+            <!-- Star Rating -->
+            <div class="star-options">
+
+                <label>
+                    <input
+                        type="radio"
+                        name="rating"
+                        value="1"
+                        required>
+                    ⭐
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="rating"
+                        value="2">
+                    ⭐⭐
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="rating"
+                        value="3">
+                    ⭐⭐⭐
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="rating"
+                        value="4">
+                    ⭐⭐⭐⭐
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="rating"
+                        value="5">
+                    ⭐⭐⭐⭐⭐
+                </label>
+
+            </div>
+
+            <!-- Comment -->
+            <textarea
+                name="comment"
+                placeholder="Write your review here..."
+                required></textarea>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                class="review-submit">
+
+                Submit Review
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Previous Reviews -->
+    <div>
+
+        <h3>Customer Reviews</h3>
+
+        <div id="reviews-list">
+
+            <p class="no-reviews">
+                Loading reviews...
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+  <script>
+
+const foodId = {{ food["id"] }};
+
+function createStars(rating) {
+    let stars = "";
+
+    for (let i = 1; i <= 5; i++) {
+        stars += i <= rating ? "⭐" : "☆";
+    }
+
+    return stars;
+}
+
+async function loadReviews() {
+
+    const response = await fetch(`/reviews/api/${foodId}`);
+    const data = await response.json();
+
+    const averageRating =
+        document.getElementById("average-rating");
+
+    const foodRating =
+        document.getElementById("food-rating");
+
+    if (data.review_count === 0) {
+
+        averageRating.innerHTML = "⭐ No ratings yet";
+        foodRating.innerHTML = "⭐ No ratings yet";
+
+    } else {
+
+        averageRating.innerHTML =
+            `⭐ ${data.average_rating} / 5
+             (${data.review_count} reviews)`;
+
+        foodRating.innerHTML =
+            `${createStars(Math.round(data.average_rating))}
+             ${data.average_rating}
+             (${data.review_count} reviews)`;
+    }
+
+    const reviewsList =
+        document.getElementById("reviews-list");
+
+    reviewsList.innerHTML = "";
+
+    if (data.reviews.length === 0) {
+
+        reviewsList.innerHTML =
+            `<p class="no-reviews">
+                No reviews yet. Be the first!
+             </p>`;
+
+        return;
+    }
+
+    data.reviews.forEach(function(review) {
+
+        const reviewCard =
+            document.createElement("div");
+
+        reviewCard.className = "review-card";
+
+        reviewCard.innerHTML = `
+            <div class="review-stars">
+                ${createStars(review.rating)}
+            </div>
+
+            <p class="review-comment">
+                ${review.comment}
+            </p>
+        `;
+
+        reviewsList.appendChild(reviewCard);
+    });
+}
+
+loadReviews();
+
+</script>
 
 
 </body>

@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from datetime import datetime
+from reviews import reviews_bp
 
 app = Flask(__name__)
 app.secret_key = "quickbite_secret_key"
+
+app.register_blueprint(reviews_bp)
 
 DATABASE = "database.db"
 
