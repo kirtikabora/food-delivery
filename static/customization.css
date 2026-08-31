@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 30px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.meal-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.meal-card h2 {
+    margin-top: 0;
+}
+
+.base-price {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.section {
+    margin-top: 25px;
+}
+
+.section h3 {
+    margin-bottom: 12px;
+}
+
+.section label {
+    display: block;
+    margin: 10px 0;
+}
+
+textarea {
+    width: 100%;
+    height: 90px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: vertical;
+}
+
+.price-box {
+    margin-top: 25px;
+    padding: 15px;
+    background: #f1f1f1;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#totalPrice {
+    font-weight: bold;
+}
+
+#addToCart {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#addToCart:hover {
+    background: #444;
+}

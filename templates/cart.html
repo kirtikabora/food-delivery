@@ -77,8 +77,23 @@
                     </h3>
 
                     <p>
-                        ₹{{ item.food["price"] }} each
-                    </p>
+    ₹{{ "%.2f"|format(item.item_price) }} each
+</p>
+{% if item.customization %}
+
+    <p>
+        🌶️ Customized Meal
+    </p>
+
+    {% if item.customization.instructions %}
+
+        <p>
+            📝 {{ item.customization.instructions }}
+        </p>
+
+    {% endif %}
+
+{% endif %}
 
                 </div>
 

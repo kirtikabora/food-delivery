@@ -148,7 +148,79 @@ def food_details(food_id):
     return render_template(
         "food.html",
         food=food
+    )# ================= CUSTOMIZE MEAL =================
+
+@app.route("/customize/<int:food_id>")
+def customize(food_id):
+
+    conn = get_db()
+
+    food = conn.execute(
+        "SELECT * FROM foods WHERE id = ?",
+        (food_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if food is None:
+        return "Food not found", 404
+
+    return render_template(
+        "customization.html",
+        food=food
     )
+    # ================= ADD CUSTOMIZED MEAL =================
+
+@app.route("/add_customized/<int:food_id>", methods=["POST"])
+def add_customized(food_id):
+
+    food = None
+
+    conn = get_db()
+
+    food = conn.execute(
+        "SELECT * FROM foods WHERE id = ?",
+        (food_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if food is None:
+        return "Food not found", 404
+
+    spice_price = float(request.form.get("spice_price", 0))
+    cheese_price = float(request.form.get("cheese_price", 0))
+    toppings_price = float(request.form.get("toppings_price", 0))
+
+    instructions = request.form.get(
+        "instructions", ""
+    ).strip()
+
+    customized_price = (
+        float(food["price"])
+        + spice_price
+        + cheese_price
+        + toppings_price
+    )
+
+    cart = session.get("cart", {})
+
+    food_id_str = str(food_id)
+
+    if food_id_str in cart:
+        cart[food_id_str] += 1
+    else:
+        cart[food_id_str] = 1
+
+    session["cart"] = cart
+
+    session["customization"] = {
+        "food_id": food_id,
+        "price": customized_price,
+        "instructions": instructions
+    }
+
+    return redirect(url_for("cart"))
 
 
 # ================= ADD TO CART =================
@@ -205,6 +277,8 @@ def cart():
 
     conn = get_db()
 
+    customization = session.get("customization")
+
     for food_id, quantity in cart.items():
 
         food = conn.execute(
@@ -214,12 +288,34 @@ def cart():
 
         if food:
 
-            subtotal = food["price"] * quantity
+            item_price = float(food["price"])
+
+            # Apply customization to the customized food
+            if (
+                customization
+                and str(customization.get("food_id")) == str(food_id)
+            ):
+
+                item_price = float(
+                    customization.get("price", item_price)
+                )
+
+            subtotal = item_price * quantity
 
             items.append({
                 "food": food,
                 "quantity": quantity,
-                "subtotal": subtotal
+                "subtotal": subtotal,
+                "item_price": item_price,
+                "customization": (
+                    customization
+                    if (
+                        customization
+                        and str(customization.get("food_id"))
+                        == str(food_id)
+                    )
+                    else None
+                )
             })
 
             total += subtotal
@@ -229,7 +325,10 @@ def cart():
     discount = session.get("discount", 0)
     coupon = session.get("coupon", "")
 
-    final_total = max(0, total - discount)
+    final_total = max(
+        0,
+        total - discount
+    )
 
     return render_template(
         "cart.html",
@@ -324,21 +423,35 @@ def payment():
     if "customer" not in session:
         return redirect(url_for("checkout"))
 
-    cart = session.get("cart", {})
+        cart = session.get("cart", {})
 
     total = 0
 
     conn = get_db()
 
+    customization = session.get("customization")
+
     for food_id, quantity in cart.items():
 
         food = conn.execute(
-            "SELECT price FROM foods WHERE id = ?",
+            "SELECT * FROM foods WHERE id = ?",
             (food_id,)
         ).fetchone()
 
         if food:
-            total += food["price"] * quantity
+
+            item_price = float(food["price"])
+
+            if (
+                customization
+                and str(customization.get("food_id"))
+                == str(food_id)
+            ):
+                item_price = float(
+                    customization.get("price", item_price)
+                )
+
+            total += item_price * quantity
 
     # Apply coupon discount
     discount = session.get("discount", 0)

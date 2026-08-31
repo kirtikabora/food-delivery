@@ -126,13 +126,25 @@
             </div>
 
 
-            <a
-                href="/add/{{ food['id'] }}"
-                class="btn add-big">
+            <div class="food-actions">
 
-                🛒 Add to Cart
+    <a
+        href="/add/{{ food['id'] }}"
+        class="btn add-big">
 
-            </a>
+        🛒 Add to Cart
+
+    </a>
+
+    <a
+        href="/customize/{{ food['id'] }}"
+        class="btn add-big">
+
+        ✨ Customize Your Meal
+
+    </a>
+
+</div>
 
 
         </div>
