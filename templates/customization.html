@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Meal Customization</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='customization.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🍔 Customize Your Meal</h1>
+
+        <div class="meal-card">
+
+        <h2>{{ food["name"] }}</h2>
+
+<p class="base-price">
+    Base Price: ₹{{ food["price"] }}
+</p>
+
+<div id="foodData"
+     data-price="{{ food['price'] }}"
+     data-food-id="{{ food['id'] }}">
+</div>
+
+            <!-- Spice Level -->
+            <div class="section">
+
+                <h3>🌶️ Spice Level</h3>
+
+                <label>
+                    <input type="radio"
+                           name="spice"
+                           value="0"
+                           checked>
+                    Mild (+₹0)
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="spice"
+                           value="10">
+                    Medium (+₹10)
+                </label>
+
+                <label>
+                    <input type="radio"
+                           name="spice"
+                           value="20">
+                    Spicy (+₹20)
+                </label>
+
+            </div>
+
+            <!-- Extra Cheese -->
+            <div class="section">
+
+                <h3>🧀 Extra Cheese</h3>
+
+                <label>
+                    <input type="checkbox"
+                           id="cheese"
+                           value="20">
+
+                    Extra Cheese (+₹20)
+                </label>
+
+            </div>
+
+            <!-- Extra Toppings -->
+            <div class="section">
+
+                <h3>🍅 Extra Toppings</h3>
+
+                <label>
+                    <input type="checkbox"
+                           class="topping"
+                           value="15">
+
+                    Tomato (+₹15)
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="topping"
+                           value="20">
+
+                    Jalapeño (+₹20)
+                </label>
+
+                <label>
+                    <input type="checkbox"
+                           class="topping"
+                           value="25">
+
+                    Extra Chicken (+₹25)
+                </label>
+
+            </div>
+
+            <!-- Special Instructions -->
+            <div class="section">
+
+                <h3>📝 Special Instructions</h3>
+
+                <textarea
+                    id="instructions"
+                    placeholder="Example: Please make it less oily..."></textarea>
+
+            </div>
+
+            <!-- Total Price -->
+            <div class="price-box">
+
+                <h2>
+                    Total Price: ₹<span id="totalPrice">0</span>
+                </h2>
+
+            </div>
+
+<form
+    id="customizationForm"
+    method="POST"
+    action="/add_customized/{{ food['id'] }}"
+>
+
+    <input
+        type="hidden"
+        name="spice_price"
+        id="spicePrice"
+        value="0"
+    >
+
+    <input
+        type="hidden"
+        name="cheese_price"
+        id="cheesePrice"
+        value="0"
+    >
+
+    <input
+        type="hidden"
+        name="toppings_price"
+        id="toppingsPrice"
+        value="0"
+    >
+
+    <input
+        type="hidden"
+        name="instructions"
+        id="instructionValue"
+    >
+
+    <button type="submit">
+        Add Customized Meal to Cart 🛒
+    </button>
+
+</form>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='customization.js') }}"></script>
+
+</body>
+</html>
