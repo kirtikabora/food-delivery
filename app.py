@@ -11,7 +11,9 @@ app.register_blueprint(reviews_bp)
 DATABASE = "database.db"
 
 
-# ================= DATABASE =================
+# =====================================================
+# DATABASE
+# =====================================================
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -20,10 +22,10 @@ def get_db():
 
 
 def init_db():
-
     conn = get_db()
 
-    # FOOD TABLE
+    # ================= FOOD TABLE =================
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS foods (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,7 +36,8 @@ def init_db():
         )
     """)
 
-    # ORDER TABLE
+    # ================= ORDER TABLE =================
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,11 +53,7 @@ def init_db():
         )
     """)
 
-    # =================================================
-    # FIX OLD DATABASE
-    # Adds new columns if they don't already exist
-    # =================================================
-
+    # Fix old databases
     try:
         conn.execute("""
             ALTER TABLE orders
@@ -79,7 +78,8 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
-    # RIDER TABLE
+    # ================= RIDER TABLE =================
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS riders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,7 +89,8 @@ def init_db():
         )
     """)
 
-    # INVENTORY TABLE
+    # ================= INVENTORY TABLE =================
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS inventory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -178,7 +179,62 @@ def init_db():
     conn.close()
 
 
-# ================= HOME =================
+# =====================================================
+# HELPER FUNCTIONS
+# =====================================================
+
+def get_cart_total():
+    """
+    Calculates total for both:
+    1. Normal cart items
+    2. Customized meals
+    """
+
+    normal_cart = session.get("cart", {})
+    customized_cart = session.get("customized_cart", [])
+
+    total = 0
+
+    conn = get_db()
+
+    # Normal items
+    for food_id, quantity in normal_cart.items():
+
+        food = conn.execute(
+            "SELECT price FROM foods WHERE id = ?",
+            (food_id,)
+        ).fetchone()
+
+        if food:
+            total += food["price"] * quantity
+
+    conn.close()
+
+    # Customized items
+    for item in customized_cart:
+        total += float(item.get("price", 0))
+
+    return total
+
+
+def get_cart_item_count():
+    """
+    Number of physical food items in the order.
+    Customized meals count as one item each.
+    """
+
+    normal_cart = session.get("cart", {})
+    customized_cart = session.get("customized_cart", [])
+
+    count = sum(normal_cart.values())
+    count += len(customized_cart)
+
+    return count
+
+
+# =====================================================
+# HOME
+# =====================================================
 
 @app.route("/")
 def home():
@@ -197,7 +253,9 @@ def home():
     )
 
 
-# ================= MENU =================
+# =====================================================
+# MENU
+# =====================================================
 
 @app.route("/menu")
 def menu():
@@ -232,7 +290,9 @@ def menu():
     )
 
 
-# ================= FOOD DETAILS =================
+# =====================================================
+# FOOD DETAILS
+# =====================================================
 
 @app.route("/food/<int:food_id>")
 def food_details(food_id):
@@ -255,7 +315,9 @@ def food_details(food_id):
     )
 
 
-# ================= ADD TO CART =================
+# =====================================================
+# NORMAL ADD TO CART
+# =====================================================
 
 @app.route("/add/<int:food_id>")
 def add_to_cart(food_id):
@@ -276,7 +338,9 @@ def add_to_cart(food_id):
     )
 
 
-# ================= REMOVE FROM CART =================
+# =====================================================
+# REMOVE NORMAL ITEM
+# =====================================================
 
 @app.route("/remove/<int:food_id>")
 def remove_from_cart(food_id):
@@ -297,19 +361,155 @@ def remove_from_cart(food_id):
     return redirect(url_for("cart"))
 
 
-# ================= CART =================
+# =====================================================
+# CUSTOMIZE MEAL PAGE
+# =====================================================
+
+@app.route("/customize/<int:food_id>")
+def customize_food(food_id):
+
+    conn = get_db()
+
+    food = conn.execute(
+        "SELECT * FROM foods WHERE id = ?",
+        (food_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if food is None:
+        return "Food not found", 404
+
+    return render_template(
+        "customization.html",
+        food=food
+    )
+
+
+# =====================================================
+# ADD CUSTOMIZED MEAL
+# =====================================================
+
+@app.route("/add_customized/<int:food_id>", methods=["POST"])
+def add_customized(food_id):
+
+    conn = get_db()
+
+    food = conn.execute(
+        "SELECT * FROM foods WHERE id = ?",
+        (food_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if food is None:
+        return "Food not found", 404
+
+    # Get customization prices
+    try:
+        spice_price = float(
+            request.form.get("spice_price", 0)
+        )
+    except ValueError:
+        spice_price = 0
+
+    try:
+        cheese_price = float(
+            request.form.get("cheese_price", 0)
+        )
+    except ValueError:
+        cheese_price = 0
+
+    try:
+        toppings_price = float(
+            request.form.get("toppings_price", 0)
+        )
+    except ValueError:
+        toppings_price = 0
+
+    instructions = request.form.get(
+        "instructions", ""
+    ).strip()
+
+    # Final customized price
+    base_price = float(food["price"])
+
+    final_price = (
+        base_price
+        + spice_price
+        + cheese_price
+        + toppings_price
+    )
+
+    # Customized meal object
+    customized_item = {
+        "food_id": food_id,
+        "name": food["name"],
+        "emoji": food["emoji"],
+        "base_price": base_price,
+        "spice_price": spice_price,
+        "cheese_price": cheese_price,
+        "toppings_price": toppings_price,
+        "instructions": instructions,
+        "price": final_price
+    }
+
+    customized_cart = session.get(
+        "customized_cart", []
+    )
+
+    customized_cart.append(customized_item)
+
+    session["customized_cart"] = customized_cart
+
+    # Reset coupon because cart total changed
+    session["discount"] = 0
+    session["coupon"] = ""
+
+    return redirect(url_for("cart"))
+
+
+# =====================================================
+# REMOVE CUSTOMIZED ITEM
+# =====================================================
+
+@app.route("/remove_customized/<int:item_index>")
+def remove_customized(item_index):
+
+    customized_cart = session.get(
+        "customized_cart", []
+    )
+
+    if 0 <= item_index < len(customized_cart):
+
+        customized_cart.pop(item_index)
+
+    session["customized_cart"] = customized_cart
+
+    # Reset coupon
+    session["discount"] = 0
+    session["coupon"] = ""
+
+    return redirect(url_for("cart"))
+
+
+# =====================================================
+# CART
+# =====================================================
 
 @app.route("/cart")
 def cart():
 
-    cart = session.get("cart", {})
+    normal_cart = session.get("cart", {})
+    customized_cart = session.get("customized_cart", [])
 
     items = []
     total = 0
 
     conn = get_db()
 
-    for food_id, quantity in cart.items():
+    # Normal cart items
+    for food_id, quantity in normal_cart.items():
 
         food = conn.execute(
             "SELECT * FROM foods WHERE id = ?",
@@ -317,26 +517,54 @@ def cart():
         ).fetchone()
 
         if food:
-
-            subtotal = food["price"] * quantity
+            item_price = float(food["price"])
+            subtotal = item_price * quantity
 
             items.append({
                 "food": food,
                 "quantity": quantity,
-                "subtotal": subtotal
+                "item_price": item_price,
+                "subtotal": subtotal,
+                "customization": None
             })
 
             total += subtotal
 
     conn.close()
 
+    # Customized cart items
+    for index, custom in enumerate(customized_cart):
+
+        conn = get_db()
+
+        food = conn.execute(
+            "SELECT * FROM foods WHERE id = ?",
+            (custom["food_id"],)
+        ).fetchone()
+
+        conn.close()
+
+        if food:
+
+            customization = {
+                "instructions": custom.get("instructions", "")
+            }
+
+            items.append({
+                "food": food,
+                "quantity": 1,
+                "item_price": float(custom["price"]),
+                "subtotal": float(custom["price"]),
+                "customization": customization,
+                "custom_index": index
+            })
+
+            total += float(custom["price"])
+
     discount = session.get("discount", 0)
     coupon = session.get("coupon", "")
 
-    final_total = max(
-        0,
-        total - discount
-    )
+    final_total = max(0, total - discount)
 
     return render_template(
         "cart.html",
@@ -348,44 +576,41 @@ def cart():
     )
 
 
-# ================= COUPON =================
 
-@app.route("/apply_coupon", methods=["POST"])
+# =====================================================
+# COUPON
+# =====================================================
+
+@app.route(
+    "/apply_coupon",
+    methods=["POST"]
+)
 def apply_coupon():
 
     coupon = request.form.get(
         "coupon", ""
     ).strip().upper()
 
-    cart = session.get("cart", {})
+    total = get_cart_total()
 
-    if not cart:
+    if total <= 0:
         return redirect(url_for("cart"))
-
-    total = 0
-
-    conn = get_db()
-
-    for food_id, quantity in cart.items():
-
-        food = conn.execute(
-            "SELECT price FROM foods WHERE id = ?",
-            (food_id,)
-        ).fetchone()
-
-        if food:
-            total += food["price"] * quantity
-
-    conn.close()
 
     if coupon == "WELCOME20":
 
-        session["discount"] = total * 0.20
+        session["discount"] = (
+            total * 0.20
+        )
+
         session["coupon"] = "WELCOME20"
 
     elif coupon == "FOOD50":
 
-        session["discount"] = min(50, total)
+        session["discount"] = min(
+            50,
+            total
+        )
+
         session["coupon"] = "FOOD50"
 
     else:
@@ -396,59 +621,95 @@ def apply_coupon():
     return redirect(url_for("cart"))
 
 
-# ================= CHECKOUT =================
+# =====================================================
+# CHECKOUT
+# =====================================================
 
-@app.route("/checkout", methods=["GET", "POST"])
+@app.route(
+    "/checkout",
+    methods=["GET", "POST"]
+)
 def checkout():
 
-    cart = session.get("cart", {})
+    total = get_cart_total()
 
-    if not cart:
+    if total <= 0:
         return redirect(url_for("menu"))
 
     if request.method == "POST":
 
         session["customer"] = {
-            "name": request.form["name"],
-            "phone": request.form["phone"],
-            "address": request.form["address"]
+            "name": request.form.get(
+                "name", ""
+            ),
+            "phone": request.form.get(
+                "phone", ""
+            ),
+            "address": request.form.get(
+                "address", ""
+            )
         }
 
-        return redirect(url_for("payment"))
+        return redirect(
+            url_for("payment")
+        )
 
-    return render_template("checkout.html")
+    return render_template(
+        "checkout.html"
+    )
 
 
-# ================= PAYMENT =================
+# =====================================================
+# PAYMENT
+# =====================================================
 
-@app.route("/payment", methods=["GET", "POST"])
+@app.route(
+    "/payment",
+    methods=["GET", "POST"]
+)
 def payment():
 
     if "customer" not in session:
-        return redirect(url_for("checkout"))
+        return redirect(
+            url_for("checkout")
+        )
 
-    cart = session.get("cart", {})
+    total = get_cart_total()
 
-    total = 0
+    if total <= 0:
+        return redirect(
+            url_for("menu")
+        )
 
-    conn = get_db()
-
-    for food_id, quantity in cart.items():
-
-        food = conn.execute(
-            "SELECT price FROM foods WHERE id = ?",
-            (food_id,)
-        ).fetchone()
-
-        if food:
-            total += food["price"] * quantity
-
-    discount = session.get("discount", 0)
+    discount = session.get(
+        "discount", 0
+    )
 
     final_total = max(
         0,
         total - discount
     )
+
+    item_count = get_cart_item_count()
+
+    # ================= SMART PRIORITY =================
+
+    if item_count >= 5:
+        priority = 3
+
+    elif item_count >= 3:
+        priority = 2
+
+    else:
+        priority = 1
+
+    # ================= PREPARATION TIME =================
+
+    prep_time = 10 + (
+        item_count * 5
+    )
+
+    # ================= CREATE ORDER =================
 
     if request.method == "POST":
 
@@ -456,28 +717,7 @@ def payment():
             "customer", {}
         )
 
-        # ================= SMART PRIORITY =================
-
-        item_count = sum(
-            cart.values()
-        )
-
-        if item_count >= 5:
-            priority = 3
-
-        elif item_count >= 3:
-            priority = 2
-
-        else:
-            priority = 1
-
-        # ================= PREPARATION TIME =================
-
-        prep_time = 10 + (
-            item_count * 5
-        )
-
-        # ================= CREATE ORDER =================
+        conn = get_db()
 
         conn.execute("""
             INSERT INTO orders
@@ -508,7 +748,9 @@ def payment():
         conn.commit()
         conn.close()
 
+        # Clear everything after successful payment
         session["cart"] = {}
+        session["customized_cart"] = []
         session["discount"] = 0
         session["coupon"] = ""
 
@@ -516,15 +758,15 @@ def payment():
             url_for("success")
         )
 
-    conn.close()
-
     return render_template(
         "payment.html",
         total=final_total
     )
 
 
-# ================= SUCCESS =================
+# =====================================================
+# SUCCESS
+# =====================================================
 
 @app.route("/success")
 def success():
@@ -540,7 +782,7 @@ def success():
 
 
 # =====================================================
-#                  SMART KITCHEN
+# SMART KITCHEN
 # =====================================================
 
 @app.route("/kitchen")
@@ -610,7 +852,9 @@ def kitchen():
     )
 
 
-# ================= UPDATE ORDER =================
+# =====================================================
+# UPDATE ORDER STATUS
+# =====================================================
 
 @app.route(
     "/kitchen/update/<int:order_id>/<status>"
@@ -628,7 +872,9 @@ def update_order_status(
     ]
 
     if status not in allowed_statuses:
-        return redirect(url_for("kitchen"))
+        return redirect(
+            url_for("kitchen")
+        )
 
     conn = get_db()
 
@@ -649,7 +895,9 @@ def update_order_status(
     )
 
 
-# ================= ASSIGN RIDER =================
+# =====================================================
+# ASSIGN RIDER
+# =====================================================
 
 @app.route(
     "/kitchen/assign/<int:order_id>",
@@ -662,7 +910,9 @@ def assign_rider(order_id):
     )
 
     if not rider_id:
-        return redirect(url_for("kitchen"))
+        return redirect(
+            url_for("kitchen")
+        )
 
     conn = get_db()
 
@@ -691,7 +941,9 @@ def assign_rider(order_id):
     )
 
 
-# ================= RIDER AVAILABLE =================
+# =====================================================
+# RIDER AVAILABLE
+# =====================================================
 
 @app.route(
     "/kitchen/rider/<int:rider_id>/available"
@@ -716,7 +968,9 @@ def rider_available(rider_id):
     )
 
 
-# ================= INVENTORY =================
+# =====================================================
+# INVENTORY
+# =====================================================
 
 @app.route(
     "/kitchen/inventory/<int:item_id>",
@@ -753,7 +1007,9 @@ def update_inventory(item_id):
     )
 
 
-# ================= RUN APP =================
+# =====================================================
+# RUN APP
+# =====================================================
 
 if __name__ == "__main__":
 
