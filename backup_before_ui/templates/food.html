@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>QuickBite — Menu</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/">🏠 <span>Home</span></a>
+
+        <a href="/menu">🍽️ <span>Menu</span></a>
+
+        <a href="/kitchen">👨‍🍳 <span>Kitchen</span></a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+                {% if cart_count > 0 %}
+                    {{ cart_count }}
+                {% endif %}
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<header class="menu-header">
+
+    <div class="mini-title">
+        Explore
+    </div>
+
+    <h1>
+        What are you craving? 🍕
+    </h1>
+
+    <p>
+        Pick your favourite. Make it yours.
+    </p>
+
+</header>
+
+
+<main class="container">
+
+    <form
+        class="big-search"
+        method="GET"
+        action="/menu">
+
+        <span>🔎</span>
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="Search burgers, pizza, biryani...">
+
+        <button type="submit">
+            Search
+        </button>
+
+    </form>
+
+
+    <div class="categories">
+
+        <a
+            href="/menu"
+            class="category-btn">
+            All
+        </a>
+
+        <a
+            href="/menu?search=Burger"
+            class="category-btn">
+            🍔 Burger
+        </a>
+
+        <a
+            href="/menu?search=Pizza"
+            class="category-btn">
+            🍕 Pizza
+        </a>
+
+        <a
+            href="/menu?search=Biryani"
+            class="category-btn">
+            🍗 Biryani
+        </a>
+
+        <a
+            href="/menu?search=Indian"
+            class="category-btn">
+            🇮🇳 Indian
+        </a>
+
+        <a
+            href="/menu?search=Dessert"
+            class="category-btn">
+            🍰 Dessert
+        </a>
+
+        <a
+            href="/menu?search=Drinks"
+            class="category-btn">
+            🥤 Drinks
+        </a>
+
+    </div>
+
+
+    <p class="menu-count">
+
+        {% if search %}
+            Showing results for
+            <strong>"{{ search }}"</strong>
+        {% else %}
+            Explore our full menu
+        {% endif %}
+
+    </p>
+
+
+    {% if foods %}
+
+    <div class="food-grid">
+
+        {% for food in foods %}
+
+        <a
+            href="/food/{{ food['id'] }}"
+            class="food-card-link">
+
+            <article class="food-card">
+
+                <div class="food-photo">
+
+                    {% if food['image'] %}
+
+                    <img
+                        src="{{ food['image'] }}"
+                        alt="{{ food['name'] }}">
+
+                    {% else %}
+
+                    <div
+                        style="
+                        width:100%;
+                        height:100%;
+                        display:grid;
+                        place-items:center;
+                        font-size:80px;
+                        background:#fff1eb;">
+                        {{ food['emoji'] }}
+                    </div>
+
+                    {% endif %}
+
+                    <div class="food-emoji">
+                        {{ food['emoji'] }}
+                    </div>
+
+                </div>
+
+
+                <div class="food-info">
+
+                    <div class="category">
+                        {{ food['category'] }}
+                    </div>
+
+                    <h3>
+                        {{ food['name'] }}
+                    </h3>
+
+                    <p>
+                        Freshly prepared and packed with flavour.
+                    </p>
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            ₹{{ food['price'] }}
+                        </strong>
+
+                        <span class="view-food">
+                            View →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            🔎
+        </div>
+
+        <h2>
+            No food found
+        </h2>
+
+        <p>
+            Try searching for something else.
+        </p>
+
+        <br>
+
+        <a href="/menu" class="btn">
+            Show everything
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>

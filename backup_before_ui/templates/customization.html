@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Customize {{ food['name'] }} — QuickBite
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='customization.css') }}">
+
+    <script
+        src="{{ url_for('static', filename='customization.js') }}"
+        defer></script>
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}"
+        defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/menu">
+            🍽️ <span>Menu</span>
+        </a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+
+                {% if cart_count > 0 %}
+                    {{ cart_count }}
+                {% endif %}
+
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="custom-page">
+
+    <a
+        href="/food/{{ food['id'] }}"
+        class="back-link">
+
+        ← Back to meal
+
+    </a>
+
+
+    <div class="custom-header">
+
+        <div class="mini-title">
+            Make it yours
+        </div>
+
+        <h1>
+            Customize your {{ food['name'] }} ✨
+        </h1>
+
+        <p>
+            Build your perfect meal exactly the way you like it.
+        </p>
+
+    </div>
+
+
+    <div
+        id="foodData"
+        data-price="{{ food['price'] }}"
+        data-food-id="{{ food['id'] }}">
+    </div>
+
+
+    <form
+        id="customizationForm"
+        method="POST"
+        action="/add_customized/{{ food['id'] }}"
+        class="custom-card">
+
+
+        <section class="custom-section">
+
+            <h2>
+                🌶️ Spice level
+            </h2>
+
+            <label class="custom-option">
+
+                <input
+                    type="radio"
+                    name="spice"
+                    value="0"
+                    checked>
+
+                <span>
+                    Mild
+                </span>
+
+                <strong>
+                    Free
+                </strong>
+
+            </label>
+
+
+            <label class="custom-option">
+
+                <input
+                    type="radio"
+                    name="spice"
+                    value="10">
+
+                <span>
+                    Medium
+                </span>
+
+                <strong>
+                    +₹10
+                </strong>
+
+            </label>
+
+
+            <label class="custom-option">
+
+                <input
+                    type="radio"
+                    name="spice"
+                    value="20">
+
+                <span>
+                    Extra Spicy 🔥
+                </span>
+
+                <strong>
+                    +₹20
+                </strong>
+
+            </label>
+
+        </section>
+
+
+        <section class="custom-section">
+
+            <h2>
+                🧀 Add-ons
+            </h2>
+
+            <label class="custom-option">
+
+                <input
+                    type="checkbox"
+                    id="cheese"
+                    value="20">
+
+                <span>
+                    Extra Cheese
+                </span>
+
+                <strong>
+                    +₹20
+                </strong>
+
+            </label>
+
+        </section>
+
+
+        <section class="custom-section">
+
+            <h2>
+                🥬 Toppings
+            </h2>
+
+            <label class="custom-option">
+
+                <input
+                    class="topping"
+                    type="checkbox"
+                    value="15">
+
+                <span>
+                    Fresh Veggies
+                </span>
+
+                <strong>
+                    +₹15
+                </strong>
+
+            </label>
+
+
+            <label class="custom-option">
+
+                <input
+                    class="topping"
+                    type="checkbox"
+                    value="20">
+
+                <span>
+                    Crispy Onions
+                </span>
+
+                <strong>
+                    +₹20
+                </strong>
+
+            </label>
+
+
+            <label class="custom-option">
+
+                <input
+                    class="topping"
+                    type="checkbox"
+                    value="25">
+
+                <span>
+                    Premium Topping
+                </span>
+
+                <strong>
+                    +₹25
+                </strong>
+
+            </label>
+
+        </section>
+
+
+        <section class="custom-section">
+
+            <h2>
+                📝 Special instructions
+            </h2>
+
+            <textarea
+                id="instructions"
+                placeholder="Anything special we should know?"></textarea>
+
+        </section>
+
+
+        <input
+            type="hidden"
+            name="spice_price"
+            id="spicePrice"
+            value="0">
+
+        <input
+            type="hidden"
+            name="cheese_price"
+            id="cheesePrice"
+            value="0">
+
+        <input
+            type="hidden"
+            name="toppings_price"
+            id="toppingsPrice"
+            value="0">
+
+        <input
+            type="hidden"
+            name="instructions"
+            id="instructionValue">
+
+
+        <div class="custom-total">
+
+            <span>
+                Total
+            </span>
+
+            <strong>
+                ₹<span id="totalPrice">
+                    {{ food['price'] }}
+                </span>
+            </strong>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="btn custom-submit">
+
+            Add Customized Meal 🛒
+
+        </button>
+
+    </form>
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>

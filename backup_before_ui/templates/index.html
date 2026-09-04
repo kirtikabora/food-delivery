@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>QuickBite — Food Delivered Fast</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/">
+            🏠 <span>Home</span>
+        </a>
+
+        <a href="/menu">
+            🍽️ <span>Menu</span>
+        </a>
+
+        <a href="/kitchen">
+            👨‍🍳 <span>Kitchen</span>
+        </a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+                {% if cart_count > 0 %}
+                    {{ cart_count }}
+                {% endif %}
+            </span>
+        </a>
+
+    </div>
+
+</nav>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-tag">
+            ✨ Fresh • Fast • Delicious
+        </div>
+
+        <h1>
+            Your cravings,
+            <span>delivered.</span>
+        </h1>
+
+        <p>
+            Discover delicious food, customize your favourite meals,
+            and get them delivered without the wait.
+        </p>
+
+        <div class="hero-actions">
+
+            <a href="/menu" class="btn">
+                Explore Menu 🍴
+            </a>
+
+            <a href="#popular" class="btn btn-outline">
+                See Popular Picks
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-image">
+
+        <img
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=85"
+            alt="Delicious food">
+
+    </div>
+
+</section>
+
+
+<section class="container" id="popular">
+
+    <div class="section-heading">
+
+        <div>
+            <div class="mini-title">
+                Customer favourites
+            </div>
+
+            <h2>
+                Popular right now 🔥
+            </h2>
+        </div>
+
+        <a href="/menu">
+            View all →
+        </a>
+
+    </div>
+
+
+    <div class="food-grid">
+
+        {% for food in foods %}
+
+        <a
+            href="/food/{{ food['id'] }}"
+            class="food-card-link">
+
+            <article class="food-card">
+
+                <div class="food-photo">
+
+                    {% if food['image'] %}
+                    <img
+                        src="{{ food['image'] }}"
+                        alt="{{ food['name'] }}">
+                    {% else %}
+                    <div
+                        style="
+                        width:100%;
+                        height:100%;
+                        display:grid;
+                        place-items:center;
+                        font-size:80px;
+                        background:#fff1eb;">
+                        {{ food['emoji'] }}
+                    </div>
+                    {% endif %}
+
+                    <div class="food-emoji">
+                        {{ food['emoji'] }}
+                    </div>
+
+                </div>
+
+
+                <div class="food-info">
+
+                    <div class="category">
+                        {{ food['category'] }}
+                    </div>
+
+                    <h3>
+                        {{ food['name'] }}
+                    </h3>
+
+                    <p>
+                        Freshly prepared and ready for your cravings.
+                    </p>
+
+                    <div class="food-bottom">
+
+                        <strong>
+                            ₹{{ food['price'] }}
+                        </strong>
+
+                        <span class="view-food">
+                            View →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<section class="container">
+
+    <div
+        style="
+        background:#171717;
+        color:white;
+        padding:45px;
+        border-radius:28px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:30px;
+        flex-wrap:wrap;">
+
+        <div>
+
+            <div class="mini-title">
+                Built for smarter food delivery
+            </div>
+
+            <h2
+                style="
+                font-family:'Plus Jakarta Sans',sans-serif;
+                font-size:32px;
+                margin:8px 0;">
+                Smart Kitchen 👨‍🍳
+            </h2>
+
+            <p style="color:#aaa;">
+                Manage orders, priorities, riders and inventory
+                from one dashboard.
+            </p>
+
+        </div>
+
+        <a href="/kitchen" class="btn">
+            Open Kitchen →
+        </a>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <strong>
+        🍔 QuickBite
+    </strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>

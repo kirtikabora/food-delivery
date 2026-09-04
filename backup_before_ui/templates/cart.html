@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ food['name'] }} — QuickBite
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='reviews.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/">🏠 <span>Home</span></a>
+
+        <a href="/menu">🍽️ <span>Menu</span></a>
+
+        <a href="/kitchen">👨‍🍳 <span>Kitchen</span></a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+                {% if cart_count > 0 %}
+                    {{ cart_count }}
+                {% endif %}
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="food-detail-container">
+
+    <a href="/menu" class="back-link">
+        ← Back to menu
+    </a>
+
+
+    <div class="food-detail">
+
+        <div class="detail-image">
+
+            {% if food['image'] %}
+
+            <img
+                src="{{ food['image'] }}"
+                alt="{{ food['name'] }}">
+
+            {% else %}
+
+            <div
+                style="
+                width:100%;
+                height:100%;
+                display:grid;
+                place-items:center;
+                background:#fff1eb;
+                font-size:150px;">
+                {{ food['emoji'] }}
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="detail-info">
+
+            <div class="category">
+                {{ food['category'] }}
+            </div>
+
+            <h1>
+                {{ food['name'] }}
+            </h1>
+
+            <div class="rating">
+                ⭐⭐⭐⭐⭐
+                <span>
+                    Loved by QuickBite customers
+                </span>
+            </div>
+
+            <p class="detail-description">
+
+                {{ food['description'] if food['description'] else
+                "A delicious QuickBite favourite prepared fresh for you." }}
+
+            </p>
+
+            <div class="detail-price">
+                ₹{{ food['price'] }}
+            </div>
+
+
+            <div class="detail-info-box">
+
+                <div>🔥 Freshly prepared</div>
+
+                <div>⚡ Fast delivery</div>
+
+                <div>✨ Customizable</div>
+
+            </div>
+
+
+            <a
+                href="/add/{{ food['id'] }}"
+                class="btn add-big add-to-cart">
+
+                🛒 Add to Cart
+
+            </a>
+
+
+            <a
+                href="/customize/{{ food['id'] }}"
+                class="btn btn-outline add-big">
+
+                ✨ Customize Your Meal
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- REVIEWS -->
+
+    <section
+        class="container"
+        style="width:100%; margin-top:70px;">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="mini-title">
+                    Community
+                </div>
+
+                <h2>
+                    Reviews & Ratings ⭐
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div id="reviewsContainer">
+            Loading reviews...
+        </div>
+
+
+        <div class="review-form">
+
+            <h3>
+                Leave a review
+            </h3>
+
+            <form id="reviewForm">
+
+                <input
+                    type="text"
+                    id="reviewName"
+                    placeholder="Your name"
+                    required>
+
+                <select
+                    id="reviewRating"
+                    required>
+
+                    <option value="">
+                        Select rating
+                    </option>
+
+                    <option value="5">
+                        ⭐⭐⭐⭐⭐
+                    </option>
+
+                    <option value="4">
+                        ⭐⭐⭐⭐
+                    </option>
+
+                    <option value="3">
+                        ⭐⭐⭐
+                    </option>
+
+                    <option value="2">
+                        ⭐⭐
+                    </option>
+
+                    <option value="1">
+                        ⭐
+                    </option>
+
+                </select>
+
+                <textarea
+                    id="reviewText"
+                    placeholder="Tell us what you think..."
+                    required></textarea>
+
+                <button class="btn" type="submit">
+                    Submit Review
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+
+<script>
+
+const foodId = {{ food['id'] }};
+
+async function loadReviews() {
+
+    try {
+
+        const response =
+            await fetch(`/reviews/api/${foodId}`);
+
+        const reviews =
+            await response.json();
+
+        const container =
+            document.getElementById("reviewsContainer");
+
+        if (!reviews.length) {
+
+            container.innerHTML =
+                "<p>No reviews yet. Be the first! 🎉</p>";
+
+            return;
+        }
+
+        container.innerHTML =
+            reviews.map(review => `
+
+                <div class="review-card">
+
+                    <strong>
+                        ${review.name}
+                    </strong>
+
+                    <div>
+                        ${"⭐".repeat(review.rating)}
+                    </div>
+
+                    <p>
+                        ${review.comment}
+                    </p>
+
+                </div>
+
+            `).join("");
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+document
+    .getElementById("reviewForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const data = {
+
+            name:
+                document.getElementById("reviewName").value,
+
+            rating:
+                document.getElementById("reviewRating").value,
+
+            comment:
+                document.getElementById("reviewText").value
+
+        };
+
+        try {
+
+            const response = await fetch(
+                `/reviews/api/${foodId}`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify(data)
+                }
+            );
+
+            if (response.ok) {
+
+                showToast("⭐ Review added!");
+
+                this.reset();
+
+                loadReviews();
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    });
+
+
+loadReviews();
+
+</script>
+
+</body>
+</html>

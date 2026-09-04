@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        QuickBite — Payment
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/menu">
+            🍽️ <span>Menu</span>
+        </a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="form-container">
+
+    <div class="mini-title">
+        Secure checkout
+    </div>
+
+    <h1>
+        Payment 💳
+    </h1>
+
+    <p>
+        This is a demo payment system for the QuickBite project.
+    </p>
+
+
+    <div
+        style="
+        background:#fff4ee;
+        padding:20px;
+        border-radius:16px;
+        margin-bottom:25px;">
+
+        <span>
+            Order Total
+        </span>
+
+        <strong
+            style="
+            float:right;
+            color:#ff5a36;
+            font-size:24px;">
+
+            ₹{{ "%.2f"|format(total) }}
+
+        </strong>
+
+    </div>
+
+
+    <form method="POST">
+
+        <label>
+            Payment Method
+        </label>
+
+        <select name="payment_method">
+
+            <option value="upi">
+                UPI
+            </option>
+
+            <option value="card">
+                Credit / Debit Card
+            </option>
+
+            <option value="cash">
+                Cash on Delivery
+            </option>
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="btn"
+            style="margin-top:18px;">
+
+            Pay ₹{{ "%.2f"|format(total) }} →
+            
+        </button>
+
+    </form>
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>

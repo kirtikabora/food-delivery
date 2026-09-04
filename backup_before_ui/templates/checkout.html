@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        QuickBite — Checkout
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/menu">
+            🍽️ <span>Menu</span>
+        </a>
+
+        <a href="/cart" class="cart-link">
+            🛒 <span>Cart</span>
+
+            <span
+                id="cartBadge"
+                class="cart-badge {% if cart_count > 0 %}show{% endif %}"
+                data-count="{{ cart_count }}">
+
+                {% if cart_count > 0 %}
+                    {{ cart_count }}
+                {% endif %}
+
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="form-container">
+
+    <div class="mini-title">
+        Almost there
+    </div>
+
+    <h1>
+        Delivery details 📍
+    </h1>
+
+    <p>
+        Tell us where to deliver your delicious order.
+    </p>
+
+
+    <form method="POST">
+
+        <label>
+            Full Name
+        </label>
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Enter your name"
+            required>
+
+
+        <label>
+            Phone Number
+        </label>
+
+        <input
+            type="tel"
+            name="phone"
+            placeholder="10-digit phone number"
+            pattern="[0-9]{10}"
+            required>
+
+
+        <label>
+            Delivery Address
+        </label>
+
+        <textarea
+            name="address"
+            rows="5"
+            placeholder="House no., street, area, city..."
+            required></textarea>
+
+
+        <button
+            type="submit"
+            class="btn"
+            style="margin-top:15px;">
+
+            Continue to Payment →
+            
+        </button>
+
+    </form>
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>

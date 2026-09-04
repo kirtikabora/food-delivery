@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        QuickBite — Order Confirmed
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="{{ url_for('static', filename='script.js') }}"
+            defer></script>
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/" class="logo">
+        🍔 Quick<span>Bite</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/menu">
+            🍽️ <span>Order More</span>
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="success-container">
+
+    <div class="success-icon">
+        ✓
+    </div>
+
+    <h1>
+        Order confirmed! 🎉
+    </h1>
+
+    <p>
+
+        Thanks
+        {% if customer and customer.get('name') %}
+            {{ customer['name'] }}
+        {% endif %}!
+
+        Your food is officially on its way.
+
+    </p>
+
+
+    <div class="tracking">
+
+        <div class="track-step active">
+
+            <div class="track-icon">
+                ✓
+            </div>
+
+            <small>
+                Order Placed
+            </small>
+
+        </div>
+
+
+        <div class="track-line active"></div>
+
+
+        <div class="track-step active">
+
+            <div class="track-icon">
+                👨‍🍳
+            </div>
+
+            <small>
+                Preparing
+            </small>
+
+        </div>
+
+
+        <div class="track-line"></div>
+
+
+        <div class="track-step">
+
+            <div class="track-icon">
+                🛵
+            </div>
+
+            <small>
+                Rider Picked Up
+            </small>
+
+        </div>
+
+
+        <div class="track-line"></div>
+
+
+        <div class="track-step">
+
+            <div class="track-icon">
+                🏠
+            </div>
+
+            <small>
+                Delivered
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <div class="delivery-card">
+
+        <h2>
+            🛵 Your rider is getting ready!
+        </h2>
+
+        <p style="color:#aaa; margin-top:5px;">
+            Estimated delivery: 25–35 minutes
+        </p>
+
+    </div>
+
+
+    <a href="/menu" class="btn">
+        Order More 🍴
+    </a>
+
+</main>
+
+
+<footer>
+
+    <strong>🍔 QuickBite</strong>
+
+    <p>
+        Good food. Good mood. ❤️
+    </p>
+
+</footer>
+
+</body>
+</html>
