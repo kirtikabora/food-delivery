@@ -124,7 +124,7 @@ def menu():
 
     craving_map = {
 
-        "spicy": ["Biryani", "Indian", "Snacks"],
+        "spicy": ["Biryani", "Snacks"],
 
         "cheesy": ["Pizza", "Burger"],
 
@@ -132,7 +132,7 @@ def menu():
 
         "healthy": ["Indian", "Sides"],
 
-        "crispy": ["Sides", "Snacks"],
+        "crispy": ["fries", "Snacks"],
 
         "comfort": ["Pasta", "Burger", "Biryani"],
 
@@ -149,7 +149,8 @@ def menu():
 
             if food["category"] in categories:
                 recommendations.append(food)
-
+    # Maximum 5 recommendations
+    recommendations = recommendations[:5]
     conn.close()
 
     return render_template(
