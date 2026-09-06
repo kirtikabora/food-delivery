@@ -53,6 +53,119 @@
         <p>
             Pick your favourite and let's get cooking.
         </p>
+        <!-- ================= AI FOOD RECOMMENDATION ================= -->
+
+<div class="ai-box">
+
+    <div class="ai-title">
+        🤖 <span>QuickBite AI</span>
+    </div>
+
+    <h2>What are you craving right now? 😋</h2>
+
+    <p class="ai-subtitle">
+        Tell us your craving and we'll find the perfect food for you!
+    </p>
+
+    <div class="craving-buttons">
+
+        <a href="/menu?craving=spicy" class="craving-btn">
+            🌶️ Spicy
+        </a>
+
+        <a href="/menu?craving=cheesy" class="craving-btn">
+            🧀 Cheesy
+        </a>
+
+        <a href="/menu?craving=sweet" class="craving-btn">
+            🍰 Sweet
+        </a>
+
+        <a href="/menu?craving=healthy" class="craving-btn">
+            🥗 Healthy
+        </a>
+
+        <a href="/menu?craving=crispy" class="craving-btn">
+            🍟 Crispy
+        </a>
+
+        <a href="/menu?craving=comfort" class="craving-btn">
+            ❤️ Comfort Food
+        </a>
+
+        <a href="/menu?craving=drinks" class="craving-btn">
+            🥤 Drinks
+        </a>
+
+    </div>
+
+</div>
+{% if craving and recommendations %}
+
+<section class="recommendation-section">
+
+    <div class="recommendation-heading">
+
+        <span>🤖 AI Recommendation</span>
+
+        <h2>
+            Perfect choices for your
+            <strong>{{ craving }}</strong> craving! 😋
+        </h2>
+
+        <p>
+            Our smart recommendation system picked these for you.
+        </p>
+
+    </div>
+
+    <div class="recommendation-grid">
+
+        {% for food in recommendations %}
+
+        <div class="recommendation-card">
+
+            <div class="food-emoji">
+                {{ food['emoji'] }}
+            </div>
+
+            <div class="recommendation-content">
+
+                <span class="match-badge">
+                    ✨ AI PICK
+                </span>
+
+                <h3>
+                    {{ food['name'] }}
+                </h3>
+
+                <p>
+                    {{ food['category'] }}
+                </p>
+
+                <div class="recommendation-bottom">
+
+                    <span class="food-price">
+                        ₹{{ food['price'] }}
+                    </span>
+
+                    <a href="/food/{{ food['id'] }}" class="try-btn">
+                        Try it →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
 
     </div>
 

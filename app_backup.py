@@ -98,7 +98,8 @@ def home():
 @app.route("/menu")
 def menu():
 
-    search = request.args.get("search", "")
+    search = request.args.get("search", "").strip()
+    craving = request.args.get("craving", "").strip().lower()
 
     conn = get_db()
 
@@ -119,12 +120,128 @@ def menu():
             "SELECT * FROM foods"
         ).fetchall()
 
+    # 🤖 AI CRAVING RECOMMENDATION
+
+    craving_map = {
+
+        "spicy": ["Biryani", "Indian", "Snacks"],
+
+        "cheesy": ["Pizza", "Burger"],
+
+        "sweet": ["Dessert"],
+
+        "healthy": ["Indian", "Sides"],
+
+        "crispy": ["Sides", "Snacks"],
+
+        "comfort": ["Pasta", "Burger", "Biryani"],
+
+        "drinks": ["Drinks"]
+    }
+
+    recommendations = []
+
+    if craving in craving_map:
+
+        categories = craving_map[craving]
+
+        for food in foods:
+
+            if food["category"] in categories:
+                recommendations.append(food)
+
     conn.close()
 
     return render_template(
         "menu.html",
         foods=foods,
-        search=search
+        search=search,
+        craving=craving,
+        recommendations=recommendations
+    )
+
+    # ================= SEARCH =================
+
+    if search:
+
+        foods = conn.execute("""
+            SELECT * FROM foods
+            WHERE name LIKE ?
+            OR category LIKE ?
+        """, (
+            f"%{search}%",
+            f"%{search}%"
+        )).fetchall()
+
+    else:
+
+        foods = conn.execute(
+            "SELECT * FROM foods"
+        ).fetchall()
+
+    # ================= AI RECOMMENDATION =================
+
+    craving_map = {
+
+        "spicy": [
+            "Biryani",
+            "Indian",
+            "Snacks"
+        ],
+
+        "cheesy": [
+            "Pizza",
+            "Burger"
+        ],
+
+        "sweet": [
+            "Dessert"
+        ],
+
+        "healthy": [
+            "Indian",
+            "Sides"
+        ],
+
+        "crispy": [
+            "Sides",
+            "Snacks"
+        ],
+
+        "comfort": [
+            "Pasta",
+            "Burger",
+            "Biryani"
+        ],
+
+        "drinks": [
+            "Drinks"
+        ]
+    }
+
+    recommendations = []
+
+    if craving in craving_map:
+
+        categories = craving_map[craving]
+
+        for food in foods:
+
+            if food["category"] in categories:
+                recommendations.append(food)
+
+    # If nothing matches, show first 3 foods
+    if craving and not recommendations:
+        recommendations = foods[:3]
+
+    conn.close()
+
+    return render_template(
+        "menu.html",
+        foods=foods,
+        search=search,
+        craving=craving,
+        recommendations=recommendations
     )
 
 

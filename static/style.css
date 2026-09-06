@@ -739,3 +739,162 @@ footer p {
     }
 
 }
+/* =========================================
+   🤖 QUICKBITE AI RECOMMENDATION
+   ========================================= */
+
+.ai-box {
+    margin: 35px auto;
+    padding: 30px;
+    max-width: 900px;
+    text-align: center;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #fff7ed, #ffffff);
+    border: 2px solid #ffe0b2;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.ai-title {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 30px;
+    background: #111;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.ai-box h2 {
+    margin: 10px 0;
+    font-size: 28px;
+}
+
+.ai-subtitle {
+    color: #777;
+    margin-bottom: 22px;
+}
+
+.craving-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.craving-btn {
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    background: white;
+    color: #222;
+    border: 1px solid #ddd;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.craving-btn:hover {
+    transform: translateY(-4px);
+    background: #111;
+    color: white;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+
+/* =========================================
+   🍽️ AI RECOMMENDATION RESULTS
+   ========================================= */
+
+.recommendation-section {
+    margin: 45px auto;
+    max-width: 1100px;
+}
+
+.recommendation-heading {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.recommendation-heading span {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.recommendation-heading h2 {
+    margin: 8px 0;
+}
+
+.recommendation-heading p {
+    color: #777;
+}
+
+.recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.recommendation-card {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.food-emoji {
+    font-size: 55px;
+}
+
+.recommendation-content {
+    flex: 1;
+}
+
+.match-badge {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 9px;
+    border-radius: 15px;
+    background: #f1f1f1;
+}
+
+.recommendation-content h3 {
+    margin: 10px 0 4px;
+}
+
+.recommendation-content p {
+    margin: 0;
+    color: #777;
+}
+
+.recommendation-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.food-price {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.try-btn {
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #111;
+    color: white;
+    font-size: 13px;
+}
+
+.try-btn:hover {
+    opacity: 0.8;
+}
